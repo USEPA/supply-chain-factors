@@ -1,0 +1,50 @@
+---
+output:
+  md_document:
+    variant: markdown_github
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# Supply Chain GHG Emission Factors
+
+Code and reproductions of the [Supply Chain GHG Emission Factors](https://cfpub.epa.gov/si/si_public_record_Report.cfm?dirEntryId=349324).
+
+## Model Descriptions
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+devtools::install_github("USEPA/useeior@SEF_v1.1")
+library(useeior)
+library(kableExtra)
+```
+
+```{r model-summary, include=FALSE}
+ModelSummary <- data.frame()
+for (modelname in sub(".yml", "", list.files("model-specs"))) {
+  model <- useeior:::initializeModel(modelname,
+                                     configpaths = paste0("model-specs/", modelname, ".yml"))
+  model <- useeior:::loadIOData(model)
+  df <- data.frame(t(c("Model Name" = modelname,
+                       "# of Sectors" = ifelse(model$specs$CommodityorIndustryType=="Commodity",
+                                               nrow(model$Commodities), nrow(model$Industries)),
+                       "Commodity (C) or Industry (I)" = model$specs$CommodityorIndustryType,
+                       "IO Data Year" = model$specs$IOYear,
+                       "GHG and Economic Output Year" = model$specs$SatelliteTable$GHG$DataYears)),
+                   check.names = FALSE)
+  ModelSummary <- rbind(ModelSummary, df)
+}
+```
+
+```{r model-summary-table}
+options(knitr.table.format = "markdown")
+kableExtra::kable(ModelSummary, align = c("l", rep("r", ncol(ModelSummary)-1)))
+```
+
+## Usage
+```r
+install.packages("rmarkdown")
+rmarkdown::render("CalculateEmissionFactors.Rmd", params = "ask")
+```
+
+# Disclaimer
+The United States Environmental Protection Agency (EPA) GitHub project code is provided on an "as is" basis and the user assumes responsibility for its use. EPA has relinquished control of the information and no longer has responsibility to protect the integrity , confidentiality, or availability of the information. Any reference to specific commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply their endorsement, recommendation or favoring by EPA. The EPA seal and logo shall not be used in any manner to imply endorsement of any commercial product or activity by EPA or the United States Government.

@@ -10,37 +10,10 @@ output:
 
 Code and reproductions of the [Supply Chain GHG Emission Factors](https://cfpub.epa.gov/si/si_public_record_Report.cfm?dirEntryId=349324).
 
-## Model Descriptions
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
-devtools::install_github("USEPA/useeior@SEF_v1.1")
-library(useeior)
-library(kableExtra)
-```
-
-```{r model-summary, include=FALSE}
-ModelSummary <- data.frame()
-for (modelname in sub(".yml", "", list.files("model-specs"))) {
-  model <- useeior:::initializeModel(modelname,
-                                     configpaths = paste0("model-specs/", modelname, ".yml"))
-  model <- useeior:::loadIOData(model)
-  df <- data.frame(t(c("Model Name" = modelname,
-                       "# of Sectors" = ifelse(model$specs$CommodityorIndustryType=="Commodity",
-                                               nrow(model$Commodities), nrow(model$Industries)),
-                       "Commodity (C) or Industry (I)" = model$specs$CommodityorIndustryType,
-                       "IO Data Year" = model$specs$IOYear,
-                       "GHG and Economic Output Year" = model$specs$SatelliteTable$GHG$DataYears)),
-                   check.names = FALSE)
-  ModelSummary <- rbind(ModelSummary, df)
-}
-```
-
-```{r model-summary-table}
-options(knitr.table.format = "markdown")
-kableExtra::kable(ModelSummary, align = c("l", rep("r", ncol(ModelSummary)-1)))
-```
-
 ## Usage
+
+### Generate supply chain GHG emission factors for specific model
+
 ```r
 install.packages("rmarkdown")
 rmarkdown::render("CalculateEmissionFactors.Rmd", params = "ask")

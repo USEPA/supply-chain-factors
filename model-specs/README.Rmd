@@ -1,0 +1,41 @@
+---
+output:
+  md_document:
+    variant: markdown_github
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+## Model Descriptions
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+if (!"devtools"%in%installed.packages()[, "Package"]) {
+  install.packages("devtools")
+}
+devtools::install_github("USEPA/useeior@SEF_v1.1")
+library(useeior)
+library(kableExtra)
+```
+
+```{r model-summary, include=FALSE}
+model_specs <- list.files("model-specs")[endsWith(list.files("model-specs"), "yml")]
+ModelSummary <- data.frame()
+for (modelname in sub(".yml", "", model_specs)) {
+  model <- useeior:::initializeModel(modelname,
+                                     configpaths = paste0("model-specs/", modelname, ".yml"))
+  model <- useeior:::loadIOData(model)
+  df <- data.frame(t(c("Model Name" = modelname,
+                       "# of Sectors" = ifelse(model$specs$CommodityorIndustryType=="Commodity",
+                                               nrow(model$Commodities), nrow(model$Industries)),
+                       "Commodity (C) or Industry (I)" = model$specs$CommodityorIndustryType,
+                       "IO Data Year" = model$specs$IOYear,
+                       "GHG and Economic Output Year" = model$specs$SatelliteTable$GHG$DataYears)),
+                   check.names = FALSE)
+  ModelSummary <- rbind(ModelSummary, df)
+}
+```
+
+```{r model-summary-table}
+options(knitr.table.format = "markdown")
+kableExtra::kable(ModelSummary, align = c("l", rep("r", ncol(ModelSummary)-1)))
+```

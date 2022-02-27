@@ -6,7 +6,7 @@ output:
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-## Model Descriptions
+## Model Description
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 if (!"devtools"%in%installed.packages()[, "Package"]) {
@@ -33,9 +33,11 @@ for (modelname in sub(".yml", "", model_specs)) {
                    check.names = FALSE)
   ModelSummary <- rbind(ModelSummary, df)
 }
+ModelSummary <- ModelSummary[order(ModelSummary[, "GHG and Economic Output Year"],
+                                   ModelSummary[, "Commodity (C) or Industry (I)"]), ]
 ```
 
 ```{r model-summary-table}
 options(knitr.table.format = "markdown")
-kableExtra::kable(ModelSummary, align = c("l", rep("r", ncol(ModelSummary)-1)))
+kableExtra::kable(ModelSummary, row.names = FALSE, align = c("l", rep("r", ncol(ModelSummary)-1)))
 ```

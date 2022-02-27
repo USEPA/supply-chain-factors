@@ -1,7 +1,7 @@
 Model: "USEEIOv2.0.15-s-GHG" # 2015 Summary, Commodity
 BaseIOSchema: 2012
 BaseIOLevel: "Summary"
-IOYear: &IOYear 2012 # Year for IO data
+IOYear: &IOYear 2015 # Year for IO data
 ModelRegionAcronyms: ["US"]
 ModelType: "EEIO"
 IODataSource: "BEA"

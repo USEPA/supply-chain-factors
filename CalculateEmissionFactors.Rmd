@@ -47,9 +47,11 @@ GHGs <- c("Carbon dioxide", "Methane", "Nitrous oxide")
 dollaryear <- params$dollaryear
 modelname <- paste0("USEEIOv2.0.",
                     substr(params$modelyear, 3, 4),
+                    "-",
                     ifelse(params$modeltype=="Commodity", "", "i"),
                     ifelse(params$modellevel=="Detail", "", "s"),
                     "-GHG")
+modelname <- sub("--", "-", modelname)
 ```
 
 ```{r build-model, include=FALSE}

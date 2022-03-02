@@ -1,5 +1,3 @@
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
 # Supply Chain GHG Emission Factors
 
 Code and reproductions of the [Supply Chain GHG Emission
@@ -46,7 +44,9 @@ USEEIOmodelname is based on the options selected by the user and matches
 one of the [model specifications](model-specs/) stored in this project.
 The fields used to defined data are define in the [format
 specifications](format-specs/), and are identical to the fields used in
-the original Supply Chain Factors dataset releases.
+the original Supply Chain Factors dataset releases. A markdown file
+(CalculateEmissionFactors.md) is automatically generated during
+execution, but it contains no original content.
 
 # Disclaimer
 

@@ -1,12 +1,12 @@
 ---
 output:
   md_document:
-    variant: markdown_github
+    variant: gfm
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-## Model Description
+## Model Descriptions
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 if (!"devtools"%in%installed.packages()[, "Package"]) {
@@ -41,3 +41,7 @@ ModelSummary <- ModelSummary[order(ModelSummary[, "GHG and Economic Output Year"
 options(knitr.table.format = "markdown")
 kableExtra::kable(ModelSummary, row.names = FALSE, align = c("l", rep("r", ncol(ModelSummary)-1)))
 ```
+
+The model specification files use the [useeior Model Specification
+format](https://github.com/USEPA/useeior/blob/master/format_specs/ModelSpecification.md) pertaining to the useeior release version that is being used to generate
+the factors.

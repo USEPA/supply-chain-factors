@@ -1,6 +1,4 @@
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
-## Model Description
+## Model Descriptions
 
 | Model Name           | \# of Sectors | Commodity (C) or Industry (I) | IO Data Year | GHG and Economic Output Year |
 |:---------------------|--------------:|------------------------------:|-------------:|-----------------------------:|
@@ -32,3 +30,8 @@
 | USEEIOv2.0.16-s-GHG  |            73 |                     Commodity |         2016 |                         2016 |
 | USEEIOv2.0.16-i-GHG  |           405 |                      Industry |         2012 |                         2016 |
 | USEEIOv2.0.16-is-GHG |            71 |                      Industry |         2016 |                         2016 |
+
+The model specification files use the [useeior Model Specification
+format](https://github.com/USEPA/useeior/blob/master/format_specs/ModelSpecification.md)
+pertaining to the useeior release version that is being used to generate
+the factors.

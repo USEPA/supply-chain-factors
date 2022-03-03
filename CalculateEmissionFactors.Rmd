@@ -1,0 +1,100 @@
+---
+title: "Supply Chain GHG Emission Factors"
+output:
+  md_document:
+    variant: gfm
+params:
+  modelyear:
+    label: "GHG and Economic Output Year"
+    value: 2016
+    input: select
+    choices: [2010, 2011, 2012, 2013, 2014, 2015, 2016]
+  modellevel:
+    label: "Level of Detail"
+    value: "Detail"
+    input: select
+    choices: ["Detail", "Summary"]
+  modeltype:
+    label: "Commodity or Industry Model"
+    value: "Commodity"
+    input: select
+    choices: ["Commodity", "Industry"]
+  dollaryear:
+    label: "Output Dollar Year"
+    value: 2018
+    input: select
+    choices: [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018]
+  export-to-CSV:
+    label: "Export SEF Table to CSV?"
+    value: "Yes"
+    input: select
+    choices: ["Yes", "No"]
+---
+
+Generate supply chain GHG emission factors.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+source("R/Functions.R")
+source("R/utils.R")
+install_useeior(SEF_version = "v1.1.1")
+library(useeior)
+library(kableExtra)
+price_adjust_matrices <- c("B", "D", "M", "N", "M_margin", "N_margin")
+GHGs <- c("Carbon dioxide", "Methane", "Nitrous oxide")
+dollaryear <- params$dollaryear
+modelname <- paste0("USEEIOv2.0.",
+                    substr(params$modelyear, 3, 4),
+                    "-",
+                    ifelse(params$modeltype=="Commodity", "", "i"),
+                    ifelse(params$modellevel=="Detail", "", "s"),
+                    "-GHG")
+modelname <- sub("--", "-", modelname)
+```
+
+```{r build-model, include=FALSE}
+# Build model
+modelconfigfile <- paste0("model-specs/", modelname, ".yml")
+model <- buildModel(modelname, configpaths = modelconfigfile)
+# Calculate margin impacts for M and N matrices
+model <- c(model, calculateMarginSectorImpacts(model))
+# Adjust price of multipliers in model
+price_adjusted_model <- list()
+for (matrix in price_adjust_matrices) {
+  price_adjusted_model[[paste0(matrix, "_pro_", dollaryear)]] <- adjustResultMatrixPrice(matrix, dollaryear, purchaser_price = FALSE, model)
+  price_adjusted_model[[paste0(matrix, "_pur_", dollaryear)]] <- adjustResultMatrixPrice(matrix, dollaryear, purchaser_price = TRUE, model)
+}
+```
+
+```{r create-EF-table}
+# Create SEF and MEF tables
+SEF_df <- generateEmissionFactorTable(model, price_adjusted_model, margin = FALSE)
+MEF_df <- generateEmissionFactorTable(model, price_adjusted_model, margin = TRUE)
+# Combine SEF and MEF tables
+table <- cbind(SEF_df, MEF_df[, "FlowAmount"], SEF_df[, "FlowAmount"] + MEF_df[, "FlowAmount"])
+table[, sapply(table, is.numeric)] <- round(table[, sapply(table, is.numeric)], 3)
+table <- table[table$Flowable%in%c(GHGs, "Other Greenhouse Gases"), ]
+# Add Data Quality
+DQ <- utils::read.table(paste0("Data Quality/DQ_", modelname, ".csv"), sep = ",",
+                        header = TRUE, stringsAsFactors = FALSE, check.names = FALSE)
+table <- merge(table, DQ, by.x = c("Sector", "Flowable"), by.y = c("SectorCode", "Flowable"))
+table[, 1:3] <- table[, c("Sector", "Name", "Flowable")]
+# Rename columns in table
+colnames(table) <- c(paste(model$specs$CommodityorIndustryType, "Code"),
+                     paste(model$specs$CommodityorIndustryType, "Name"),
+                     "Substance",
+                     "Unit",
+                     "Supply Chain Emission Factors without Margins",
+                     "Margins of Supply Chain Emission Factors",
+                     "Supply Chain Emission Factors with Margins",
+                     paste("DQ", colnames(DQ)[3:7], "of Factors without Margins"))
+# Remove records of all gov and Rest of World adjustment
+table <- table[!substr(table[, paste(params$modeltype, "Code")], 1, 1)%in%c("S", "G"), ]
+```
+
+```{r create-table-to-CSV}
+if (params$`export-to-CSV`=="Yes") {
+  write_to_filename <- paste0("SupplyChainGHGEmissionFactors_", modelname, ".csv")
+  write.csv(table, write_to_filename, row.names = FALSE)
+}
+```

@@ -1,0 +1,43 @@
+---
+output:
+  md_document:
+    variant: gfm
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+## Model Descriptions
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+source("R/utils.R")
+install_useeior(SEF_version = "v1.1.1")
+library(useeior)
+library(kableExtra)
+```
+
+```{r model-summary, include=FALSE}
+model_specs <- list.files("model-specs")[endsWith(list.files("model-specs"), "yml")]
+ModelSummary <- data.frame()
+for (modelname in sub(".yml", "", model_specs)) {
+  model <- useeior:::initializeModel(modelname,
+                                     configpaths = paste0("model-specs/", modelname, ".yml"))
+  model <- useeior:::loadIOData(model)
+  df <- data.frame(t(c("Model Name" = modelname,
+                       "# of Sectors" = ifelse(model$specs$CommodityorIndustryType=="Commodity",
+                                               nrow(model$Commodities), nrow(model$Industries)),
+                       "Commodity (C) or Industry (I)" = model$specs$CommodityorIndustryType,
+                       "IO Data Year" = model$specs$IOYear,
+                       "GHG and Economic Output Year" = model$specs$SatelliteTable$GHG$DataYears)),
+                   check.names = FALSE)
+  ModelSummary <- rbind(ModelSummary, df)
+}
+ModelSummary <- ModelSummary[order(ModelSummary[, "GHG and Economic Output Year"],
+                                   ModelSummary[, "Commodity (C) or Industry (I)"]), ]
+```
+
+```{r model-summary-table}
+options(knitr.table.format = "markdown")
+kableExtra::kable(ModelSummary, row.names = FALSE, align = c("l", rep("r", ncol(ModelSummary)-1)))
+```
+
+The model specification files use the [useeior Model Specification format](https://github.com/USEPA/useeior/blob/master/format_specs/ModelSpecification.md) pertaining to the `useeior` release version that is being used to generate the factors.

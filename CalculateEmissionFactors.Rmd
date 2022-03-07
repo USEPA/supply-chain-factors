@@ -50,6 +50,7 @@ modelname <- paste0("USEEIOv2.0.",
                     ifelse(params$modellevel=="Detail", "", "s"),
                     "-GHG")
 modelname <- sub("--", "-", modelname)
+checkModelIOYear(modelname)
 ```
 
 ```{r build-model, include=FALSE}

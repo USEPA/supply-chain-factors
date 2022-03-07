@@ -20,3 +20,18 @@ install_useeior <- function(SEF_version) {
     devtools::install_github(paste0("USEPA/useeior@", useeior_tag))
   }
 }
+
+#' Check if model IO year is consistent with year in model name. Stop if different.
+#' @param modelname Name of the model from a config file.
+checkModelIOYear <- function(modelname){
+  model <- useeior:::initializeModel(modelname,
+                                     configpaths = paste0("modelspecs/", modelname, ".yml"))
+  modelname_year <- as.numeric(paste0("20", sub(".*\\.", "", substr(modelname, 1, 13))))
+  if(model$specs$BaseIOLevel!="Detail" && model$specs$IOYear!=modelname_year) {
+    stop(paste("Year in model name of", modelname,
+               "≠ IO year in model specs. Review model specs."))
+  }
+  if (model$specs$BaseIOLevel=="Detail" && model$specs$IOYear!=2012) {
+    stop(paste("Year in model name of", modelname, "≠ 2012. Review model specs."))
+  }
+}

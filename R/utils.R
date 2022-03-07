@@ -9,14 +9,14 @@ install_useeior <- function(SEF_version) {
     install.packages("devtools")
   }
   if (!"useeior"%in%installed_pkg[, "Package"]) {
-    logging::loginfo(paste0("Installing useeior v", useeior_ver, " (tag @", useeior_tag, ") from GitHub..."))
+    cli::cli_alert_info("Installing useeior v{useeior_ver} (tag @{useeior_tag}) from GitHub...")
     devtools::install_github(paste0("USEPA/useeior@", useeior_tag))
   }
-  if ("useeior"%in%installed_pkg[, "Package"] && useeior_ver!=installed_pkg[installed_pkg[, "Package"]=="useeior", "Version"]) {
-    logging::logwarn(paste0("A new version of useeior (v", useeior_ver, ") will be installed for generating SEF ", SEF_version,
-                            ". The useeior v", installed_pkg[installed_pkg[, "Package"]=="useeior", "Version"],
-                            " you have installed will be overwritten."))
-    logging::loginfo(paste0("Installing useeior v", useeior_ver, " (tag @", useeior_tag, ") from GitHub..."))
+  installed_useeior_ver <- installed_pkg[installed_pkg[, "Package"]=="useeior", "Version"]
+  if ("useeior"%in%installed_pkg[, "Package"] && useeior_ver!=installed_useeior_ver) {
+    cli::cli_alert_warning(c("A new version of useeior (v{useeior_ver}) will be installed for generating SEF {SEF_version}. ",
+                             "The useeior v{installed_useeior_ver} you have installed will be overwritten."))
+    cli::cli_alert_info("Installing useeior v{useeior_ver} (tag @{useeior_tag}) from GitHub...")
     devtools::install_github(paste0("USEPA/useeior@", useeior_tag))
   }
 }

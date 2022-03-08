@@ -10,7 +10,8 @@ Factors](https://cfpub.epa.gov/si/si_public_record_Report.cfm?dirEntryId=349324)
     permissions set to install R packages and write files to a local
     project folder.
 3.  A local version of this repository, preferably a
-    [release](./releases) version to create EPA-verified factors.
+    [release](https://github.com/USEPA/supply-chain-factors/releases)
+    version to create EPA-verified factors.
 
 ### Optional Requirements
 

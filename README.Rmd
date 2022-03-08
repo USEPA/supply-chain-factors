@@ -13,7 +13,7 @@ Code to produce the [Supply Chain GHG Emission Factors](https://cfpub.epa.gov/si
 ## Software and Hardware Requirements
 1. [R](https://www.r-project.org/) software, version >= 3.6
 2. A Windows, Mac, or Linux computer with an Internet connection and permissions set to install R packages and write files to a local project folder.
-3. A local version of this repository, preferably a [release](./releases) version to create EPA-verified factors.
+3. A local version of this repository, preferably a [release](https://github.com/USEPA/supply-chain-factors/releases) version to create EPA-verified factors.
 
 ### Optional Requirements
 1. [git](https://github.com/git-guides/install-git), if users wish to pull the code from this repository using git, instead of downloading a a zip file of the code.

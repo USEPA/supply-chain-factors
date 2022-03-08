@@ -37,7 +37,7 @@ Generate supply chain GHG emission factors.
 knitr::opts_chunk$set(echo = FALSE)
 source("R/Functions.R")
 source("R/utils.R")
-install_useeior(SEF_version = "v1.1.1")
+install_useeior(get_SEF_version())
 library(useeior)
 library(kableExtra)
 price_adjust_matrices <- c("B", "D", "M", "N", "M_margin", "N_margin")
@@ -50,6 +50,7 @@ modelname <- paste0("USEEIOv2.0.",
                     ifelse(params$modellevel=="Detail", "", "s"),
                     "-GHG")
 modelname <- sub("--", "-", modelname)
+checkModelIOYear(modelname)
 ```
 
 ```{r build-model, include=FALSE}

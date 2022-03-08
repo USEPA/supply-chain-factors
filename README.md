@@ -35,8 +35,8 @@ file then [create a project from the existing directory within
 RStudio](https://support.rstudio.com/hc/en-us/articles/200526207-Using-RStudio-Projects)
 by selecting the unzipped local directory of files.
 
-If users choose to clone this repository, they can [create a project by
-cloing the repository with
+If users have Git installed, they can [create a project by cloning the
+repository with
 RStudio](https://resources.github.com/whitepapers/github-and-rstudio/#:~:text=Clone%20the%20repository%20with%20RStudio).
 
 Once a project is created, double click to open it, then open the

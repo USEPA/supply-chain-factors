@@ -24,11 +24,6 @@ params:
     value: 2018
     input: select
     choices: [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018]
-  export-to-CSV:
-    label: "Export SEF Table to CSV?"
-    value: "Yes"
-    input: select
-    choices: ["Yes", "No"]
 ---
 
 Generate supply chain GHG emission factors.
@@ -94,8 +89,6 @@ table <- table[!substr(table[, paste(params$modeltype, "Code")], 1, 1)%in%c("S",
 ```
 
 ```{r create-table-to-CSV}
-if (params$`export-to-CSV`=="Yes") {
-  write_to_filename <- paste0("SupplyChainGHGEmissionFactors_", modelname, ".csv")
-  write.csv(table, write_to_filename, row.names = FALSE)
-}
+write_to_filename <- paste0("SupplyChainGHGEmissionFactors_", modelname, ".csv")
+write.csv(table, write_to_filename, row.names = FALSE)
 ```

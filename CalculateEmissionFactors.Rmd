@@ -92,3 +92,6 @@ table <- table[!substr(table[, paste(params$modeltype, "Code")], 1, 1)%in%c("S",
 write_to_filename <- paste0("SupplyChainGHGEmissionFactors_", modelname, ".csv")
 write.csv(table, write_to_filename, row.names = FALSE)
 ```
+
+Saved `r write_to_filename`.
+

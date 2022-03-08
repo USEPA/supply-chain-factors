@@ -32,7 +32,7 @@ install_useeior <- function(SEF_version) {
 #' @param modelname Name of the model from a config file.
 checkModelIOYear <- function(modelname){
   model <- useeior:::initializeModel(modelname,
-                                     configpaths = paste0("modelspecs/", modelname, ".yml"))
+                                     configpaths = paste0("model-specs/", modelname, ".yml"))
   modelname_year <- as.numeric(paste0("20", sub(".*\\.", "", substr(modelname, 1, 13))))
   if(model$specs$BaseIOLevel!="Detail" && model$specs$IOYear!=modelname_year) {
     stop(paste("Year in model name of", modelname,

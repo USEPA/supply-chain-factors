@@ -25,7 +25,7 @@ The code in this package can be used to generate the USEEIO-based Supply Chain G
 
 If users choose to download a zip file of the code, they can unzip the file then [create a project from the existing directory within RStudio](https://support.rstudio.com/hc/en-us/articles/200526207-Using-RStudio-Projects) by selecting the unzipped local directory of files.
 
-If users choose to clone this repository, they can [create a project by cloing the repository with RStudio](https://resources.github.com/whitepapers/github-and-rstudio/#:~:text=Clone%20the%20repository%20with%20RStudio).
+If users have git installed, they can [create a project by cloning the repository with RStudio](https://resources.github.com/whitepapers/github-and-rstudio/#:~:text=Clone%20the%20repository%20with%20RStudio).
 
 Once a project is created, double click to open it, then open the *CalculateEmissionFactors.Rmd* in the editor, click on *Knit* and select *Knit with Parameters…*.
 

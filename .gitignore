@@ -4,3 +4,4 @@
 .Ruserdata
 supply-chain-factors.Rproj
 CalculateEmissionFactors.md
+GenerateEmissionFactorsDataset.Rmd

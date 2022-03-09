@@ -21,7 +21,7 @@ Code to produce the [Supply Chain GHG Emission Factors](https://cfpub.epa.gov/si
 
 ## Usage
 
-The code in this package can be used to generate the USEEIO-based Supply Chain GHG Emission Factors, based on options selected by the user at run-time. 
+The code in this repository can be used to generate the USEEIO-based Supply Chain GHG Emission Factors, based on options selected by the user at run-time. 
 
 If users choose to download a zip file of the code, they can unzip the file then [create a project from the existing directory within RStudio](https://support.rstudio.com/hc/en-us/articles/200526207-Using-RStudio-Projects) by selecting the unzipped local directory of files.
 

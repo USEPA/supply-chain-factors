@@ -7,7 +7,7 @@ Factors](https://cfpub.epa.gov/si/si_public_record_Report.cfm?dirEntryId=349324)
 
 ## Software and Hardware Requirements
 
-1.  [R](https://www.r-project.org/) software, version >= 3.6
+1.  [R](https://www.r-project.org/) software, version \>= 3.6
 2.  A Windows, Mac, or Linux computer with an Internet connection and
     permissions set to install R packages and write files to a local
     project folder.
@@ -26,9 +26,9 @@ Factors](https://cfpub.epa.gov/si/si_public_record_Report.cfm?dirEntryId=349324)
 
 ## Usage
 
-The code in this package can be used to generate the USEEIO-based Supply
-Chain GHG Emission Factors, based on options selected by the user at
-run-time.
+The code in this repository can be used to generate the USEEIO-based
+Supply Chain GHG Emission Factors, based on options selected by the user
+at run-time.
 
 If users choose to download a zip file of the code, they can unzip the
 file then [create a project from the existing directory within

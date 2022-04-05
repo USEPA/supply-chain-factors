@@ -2,8 +2,18 @@
 
 # Supply Chain GHG Emission Factors
 
-Code to produce the [Supply Chain GHG Emission
+This repository provides code to produce the [Supply Chain GHG Emission
 Factors](https://cfpub.epa.gov/si/si_public_record_Report.cfm?dirEntryId=349324).
+
+Watch this [EPA webinar](https://www.youtube.com/watch?v=pJ8gvZPdcgc) to
+understand how to produce the Factors and how to use them for
+organizational GHG reporting.
+
+Check out
+[Discussions](https://github.com/USEPA/supply-chain-factors/discussions)
+for FAQs. If you don’t see your questions in it, feel free to post them.
+If you want answer a posted question or add comments to a question, you
+are welcome to submit them.
 
 ## Software and Hardware Requirements
 

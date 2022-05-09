@@ -24,6 +24,14 @@ params:
     value: 2018
     input: select
     choices: [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018]
+  factorform:
+    label: "Form of Factors"
+    value: "Scientific Notation"
+    input: select
+    choices: ["Scientific Notation", "Decimal"]
+  digit:
+    label: "Number of Digit (Applicable to Scientific Notation and Decimal)"
+    value: 3
 ---
 
 Generate supply chain GHG emission factors.
@@ -68,7 +76,14 @@ SEF_df <- generateEmissionFactorTable(model, price_adjusted_model, margin = FALS
 MEF_df <- generateEmissionFactorTable(model, price_adjusted_model, margin = TRUE)
 # Combine SEF and MEF tables
 table <- cbind(SEF_df, MEF_df[, "FlowAmount"], SEF_df[, "FlowAmount"] + MEF_df[, "FlowAmount"])
-table[, sapply(table, is.numeric)] <- round(table[, sapply(table, is.numeric)], 3)
+EF_cols <- colnames(table[, sapply(table, is.numeric)])
+if (params$factorform == "Scientific Notation") {
+  table[, EF_cols] <- lapply(table[, EF_cols],
+                           function(x) scales::scientific(x, params$digit + 1))
+} else if (params$factorform == "Decimal Form") {
+  table[, EF_cols] <- round(table[, EF_cols], params$digit)
+}
+
 table <- table[table$Flowable%in%c(GHGs, "Other Greenhouse Gases"), ]
 # Add Data Quality
 DQ <- utils::read.table(paste0("Data Quality/DQ_", modelname, ".csv"), sep = ",",

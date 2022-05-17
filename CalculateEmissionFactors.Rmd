@@ -32,6 +32,7 @@ params:
   digit:
     label: "Number of Digit (Applicable to Scientific Notation and Decimal)"
     value: 3
+    min: 1
 ---
 
 Generate supply chain GHG emission factors.

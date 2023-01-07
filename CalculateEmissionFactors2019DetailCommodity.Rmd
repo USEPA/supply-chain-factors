@@ -1,0 +1,72 @@
+---
+title: "Supply Chain GHG Emission Factors for 2019 NAICS-6 in CO2-equivalent"
+output:
+  md_document:
+    variant: gfm
+---
+
+Generate supply chain GHG emission factors.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+source("R/Functions.R")
+source("R/utils.R")
+#install_useeior(get_SEF_version())
+library(useeior)
+library(kableExtra)
+price_adjust_matrices <- c("B", "D", "M", "N", "M_margin", "N_margin")
+#GHGs <- c("Carbon dioxide", "Methane", "Nitrous oxide")
+dollaryear <- 2019
+#modelname <- "USEEIOv2.1.19-GHG"
+modelname <- "USEEIOv2.1.16-GHG"
+checkModelIOYear(modelname)
+```
+
+```{r build-model, include=FALSE}
+# Build model
+modelconfigfile <- paste0("model-specs/", modelname, ".yml")
+model <- buildModel(modelname, configpaths = modelconfigfile)
+# Calculate margin impacts for M and N matrices
+model <- c(model, calculateMarginSectorImpacts(model))
+# Adjust price of multipliers in model
+price_adjusted_model <- list()
+for (matrix in price_adjust_matrices) {
+  price_adjusted_model[[paste0(matrix, "_pro_", dollaryear)]] <- adjustResultMatrixPrice(matrix, dollaryear, purchaser_price = FALSE, model)
+  price_adjusted_model[[paste0(matrix, "_pur_", dollaryear)]] <- adjustResultMatrixPrice(matrix, dollaryear, purchaser_price = TRUE, model)
+}
+```
+
+```{r create-EF-table}
+# Create SEF and MEF tables
+SEF_df <- generateEmissionFactorTable(model, price_adjusted_model, margin = FALSE)
+MEF_df <- generateEmissionFactorTable(model, price_adjusted_model, margin = TRUE)
+# Combine SEF and MEF tables
+table <- cbind(SEF_df, MEF_df[, "FlowAmount"], SEF_df[, "FlowAmount"] + MEF_df[, "FlowAmount"])
+table[, sapply(table, is.numeric)] <- round(table[, sapply(table, is.numeric)], 3)
+#table <- table[table$Flowable%in%c(GHGs, "Other Greenhouse Gases"), ]
+# Add Data Quality
+#DQ <- utils::read.table(paste0("Data Quality/DQ_", modelname, ".csv"), sep = ",",
+#                        header = TRUE, stringsAsFactors = FALSE, check.names = FALSE)
+#table <- merge(table, DQ, by.x = c("Sector", "Flowable"), by.y = c("SectorCode", "Flowable"))
+table[, 1:3] <- table[, c("Sector", "Name", "Flowable")]
+# Rename columns in table
+colnames(table) <- c(paste(model$specs$CommodityorIndustryType, "Code"),
+                     paste(model$specs$CommodityorIndustryType, "Name"),
+                     "Substance",
+                     "Unit",
+                     "Supply Chain Emission Factors without Margins",
+                     "Margins of Supply Chain Emission Factors",
+                     "Supply Chain Emission Factors with Margins") #,
+                     #paste("DQ", colnames(DQ)[3:7], "of Factors without Margins"))
+# Remove records of all gov and Rest of World adjustment
+#table <- table[!substr(table[, paste(params$modeltype, "Code")], 1, 1)%in%c("S", "G"), ]
+table <- table[!substr(table[, "Commodity Code"], 1, 1)%in%c("S", "G"), ]
+```
+
+```{r create-table-to-CSV}
+write_to_filename <- paste0("SupplyChainGHGEmissionFactors_", modelname, ".csv")
+write.csv(table, write_to_filename, row.names = FALSE)
+```
+
+Saved `r write_to_filename`.
+

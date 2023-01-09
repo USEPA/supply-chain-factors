@@ -36,3 +36,49 @@ generateEmissionFactorTable <- function(model, price_adjusted_model, margin = FA
   df_long <- df_long[, c("Sector", "Name", "Flowable", "Unit", "FlowAmount")]
   return(df_long)
 }
+
+
+#' Maps a table of SEFs/MEFs from model sectors to NAICS 2017.
+#' flexible for different field names for codes and names
+#' @param table A df of SEFs/MEFs in the form of the table in the calculateEmissionsFactors script
+#' @param modelcrosswalk The crosswalk object from the model
+#' @param useeiocodefield Name of the field with the model code
+#' @param useeionamefield Name of the field with the model name
+#' @return A emission factor table.
+mapto2017NAICS <- function(table,modelcrosswalk,useeiocodefield,useeionamefield) {
+  library(devtools)
+  # subset the model original crosswalk to just get model sectors and NAICS_6, which is 2012 NAICS
+  xwalk <- modelcrosswalk[,c("USEEIO","NAICS")]
+  #Just get NAICS 6
+  xwalk <- xwalk[nchar(xwalk$NAICS) == 6, ]
+  # leaves some NAs, drop those rows
+  xwalk <- na.omit(xwalk)
+  
+  table <- merge(table,xwalk, by.x = c(useeiocodefield), by.y = "USEEIO")
+  
+  # Load in 2012 to 2017 NAICS crosswalk
+  naics_12_to_17 <- getNAICS2012to2017Concordances()
+  naics_12_to_17 <- naics_12_to_17[,c("2012 NAICS Code","2017 NAICS Code","2017 NAICS Title")]
+  
+  # Merge this in with the table
+  table <- merge(table,naics_12_to_17, by.x = c("NAICS"), by.y = "2012 NAICS Code")
+  
+  # Remove the additional columns up the fields 
+  #table <- table[,-c("NAICS",useeiocodefield,useeionamefield)]
+  return(table)
+}
+
+#' Loads the Census NAICS 2012 to 2017 crosswalk if not already present
+#' Repurposed from useeior package 
+#' Original at https://github.com/USEPA/useeior/blob/6e6b2a6c73efce8a077af76857da71cae8b4bdbf/R/CrosswalkFunctions.R#L217
+getNAICS2012to2017Concordances <- function() {
+  filename <- "2012_to_2017_NAICS.xlsx"
+  if(!file.exists(filename)) {
+    utils::download.file("https://www.census.gov/naics/concordances/2012_to_2017_NAICS.xlsx",
+                         filename, mode = "wb")
+  }
+  df <- as.data.frame(readxl::read_excel(filename, sheet = 1, col_names = TRUE, skip = 2))
+  df <- df[, startsWith(colnames(df), "20")]
+  return(df)
+}
+

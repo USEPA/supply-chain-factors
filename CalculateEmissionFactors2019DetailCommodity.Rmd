@@ -17,15 +17,15 @@ library(kableExtra)
 price_adjust_matrices <- c("B", "D", "M", "N", "M_margin", "N_margin")
 #GHGs <- c("Carbon dioxide", "Methane", "Nitrous oxide")
 dollaryear <- 2019
-#modelname <- "USEEIOv2.1.19-GHG"
-modelname <- "USEEIOv2.1.16-GHG"
+modelname <- "USEEIOv2.1.19-GHG"
+#modelname <- "USEEIOv2.1.16-GHG"
 checkModelIOYear(modelname)
 ```
 
 ```{r build-model, include=FALSE}
 # Build model
-modelconfigfile <- paste0("model-specs/", modelname, ".yml")
-model <- buildModel(modelname, configpaths = modelconfigfile)
+modelconfigfile <- c(paste0("model-specs/", modelname, ".yml"),"model-specs/WasteDisaggregationDetail.yml")
+model <- buildModel(modelname, configpaths=modelconfigfile)
 # Calculate margin impacts for M and N matrices
 model <- c(model, calculateMarginSectorImpacts(model))
 # Adjust price of multipliers in model
@@ -42,7 +42,6 @@ SEF_df <- generateEmissionFactorTable(model, price_adjusted_model, margin = FALS
 MEF_df <- generateEmissionFactorTable(model, price_adjusted_model, margin = TRUE)
 # Combine SEF and MEF tables
 table <- cbind(SEF_df, MEF_df[, "FlowAmount"], SEF_df[, "FlowAmount"] + MEF_df[, "FlowAmount"])
-table[, sapply(table, is.numeric)] <- round(table[, sapply(table, is.numeric)], 3)
 #table <- table[table$Flowable%in%c(GHGs, "Other Greenhouse Gases"), ]
 # Add Data Quality
 #DQ <- utils::read.table(paste0("Data Quality/DQ_", modelname, ".csv"), sep = ",",
@@ -50,21 +49,34 @@ table[, sapply(table, is.numeric)] <- round(table[, sapply(table, is.numeric)], 
 #table <- merge(table, DQ, by.x = c("Sector", "Flowable"), by.y = c("SectorCode", "Flowable"))
 table[, 1:3] <- table[, c("Sector", "Name", "Flowable")]
 # Rename columns in table
-colnames(table) <- c(paste(model$specs$CommodityorIndustryType, "Code"),
-                     paste(model$specs$CommodityorIndustryType, "Name"),
+useeiocodefield <- paste(model$specs$CommodityorIndustryType, "Code")
+useeionamefield <- paste(model$specs$CommodityorIndustryType, "Name")
+seffields <-  c("Supply Chain Emission Factors without Margins","Margins of Supply Chain Emission Factors",
+"Supply Chain Emission Factors with Margins")
+colnames(table) <- c(useeiocodefield,
+                     useeionamefield,
                      "Substance",
                      "Unit",
-                     "Supply Chain Emission Factors without Margins",
-                     "Margins of Supply Chain Emission Factors",
-                     "Supply Chain Emission Factors with Margins") #,
+                     seffields) #,
                      #paste("DQ", colnames(DQ)[3:7], "of Factors without Margins"))
+
 # Remove records of all gov and Rest of World adjustment
 #table <- table[!substr(table[, paste(params$modeltype, "Code")], 1, 1)%in%c("S", "G"), ]
-table <- table[!substr(table[, "Commodity Code"], 1, 1)%in%c("S", "G"), ]
+table <- table[!substr(table[, useeiocodefield], 1, 1)%in%c("S", "G"), ]
+
+# Drop 0s
+table <- table[table[,seffields[1]] != 0,]
+
+# Associate SEFs with 2017 NAICS-6
+table <- mapto2017NAICS(table,model,useeiocodefield,useeionamefield,seffields)
+
+# Round table values to 3 digits
+table[, sapply(table, is.numeric)] <- round(table[, sapply(table, is.numeric)], 3)
+
 ```
 
 ```{r create-table-to-CSV}
-write_to_filename <- paste0("SupplyChainGHGEmissionFactors_", modelname, ".csv")
+write_to_filename <- paste0("SupplyChainGHGEmissionFactors_NAICS2017_", modelname, ".csv")
 write.csv(table, write_to_filename, row.names = FALSE)
 ```
 

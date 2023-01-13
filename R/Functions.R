@@ -73,9 +73,13 @@ mapto2017NAICS <- function(table,model,useeiocodefield,useeionamefield, seffield
   table_uni <- table[setdiff(rownames(table),rownames(table_mult)),]
   
   # For NAICS 2017 with multiple factors, use output to calculate a weighted average
-  AllocationTable <- getNAICStoBEAAllocation(2019,model)
+  # First create a mapping between NAICS and model codes
+  mapping <- table_mult[,c(useeiocodefield,"2017 NAICS Code")]
+  colnames(mapping) <- c("USEEIO_Code","NAICS_Code")
+  
+  AllocationTable <- getCommodityOutput2NAICSAllocation(2019,mapping,model)
   # Ma
-  table_mult_alloc <- merge(table_mult,AllocationTable,by.x=c("NAICS",useeiocodefield),by.y=c("NAICS_Code","BEA_Code"))
+  table_mult_alloc <- merge(table_mult,AllocationTable,by.x=c("2017 NAICS Code",useeiocodefield),by.y=c("NAICS_Code","USEEIO_Code"))
   
   # Multiple SEF fields by allocation factor
   table_mult_alloc[,seffields] <- lapply(table_mult_alloc[, seffields], function(x,y) x * y, y = table_mult_alloc$allocation_factor)
@@ -89,7 +93,6 @@ mapto2017NAICS <- function(table,model,useeiocodefield,useeionamefield, seffield
   table_mult[,seffields] <- table_mult_alloc_agg[match(table_mult$`2017 NAICS Code`,table_mult_alloc_agg$Group.1),seffields]
   
   # Bind uni and mult back together
-  
   table_2017 <- rbind(table_uni,table_mult)
   
   
@@ -117,27 +120,22 @@ getNAICS2012to2017Concordances <- function() {
 }
 
 
-#' Determine allocation factors between NAICS and BEA sectors based on Industry output.
+#' Determine allocation factors between given NAICS and model sectors based on commodity output.
 #' Slightly modified from https://github.com/USEPA/useeior/blob/6e6b2a6c73efce8a077af76857da71cae8b4bdbf/R/CrosswalkFunctions.R#L15
-#' Changes: Just filter for 6-digit NAICS; use commodity output in place of industry output 
+#' Changes: Use given Just filter for 6-digit NAICS; use commodity output in place of industry output 
 #' @param model A complete EEIO model: a list with USEEIO model components and attributes.
-#' @param year Year of model Industry output.
-#' @return A table of allocation factors between NAICS and BEA sectors.
-getNAICStoBEAAllocation <- function (year, model) {
-  # Keep USEEIO and NAICS columns in MasterCrosswalk2012 table based on the model specs
-  NAICStoBEA <- unique(model$crosswalk[, c("NAICS", "USEEIO")])
-  colnames(NAICStoBEA) <- c("NAICS_Code", "BEA_Code")
-  # Drop all but 6-digit NAICS code
-  NAICStoBEA <- NAICStoBEA[nchar(NAICStoBEA$NAICS_Code) == 6, ]
-  # Select the repeated NAICS codes that need allocation
-  AllocationCodes <- NAICStoBEA[duplicated(NAICStoBEA$NAICS_Code) | duplicated(NAICStoBEA$NAICS_Code, fromLast = TRUE), ]
-  AllocationCodes <- stats::na.omit(AllocationCodes)
-  # Merge AllocationCodes with Gross Output table to calculate allocation factors
+#' @param model A mappings with fields USEEIO_Code and NAICS_Code between given model codes and given NAICS codes
+#' @param year Year of model output.
+#' @return A table of allocation factors for NAICS sectors for each model sector contributing to NAICS.
+getCommodityOutput2NAICSAllocation <- function (year, mapping, model) {
+  
+  # Get output table for given year
   output <- model$MultiYearCommodityOutput[, as.character(year), drop = FALSE]
   output$Code <- gsub("/.*", "", row.names(output))
   output$Location <- gsub(".*/", "", row.names(output))
-  AllocationTable <- merge(AllocationCodes, output,
-                           by.x = "BEA_Code", by.y = "Code", all.x = TRUE)
+  # Merge mapping with Gross Output table to calculate allocation factors
+  AllocationTable <- merge(mapping, output,
+                           by.x = "USEEIO_Code", by.y = "Code", all.x = TRUE)
   AllocationTable$Output <- AllocationTable[, as.character(year)]
   # Insert placeholders for NAs in the "Output" column
   AllocationTable[is.na(AllocationTable)] <- 1
@@ -148,6 +146,6 @@ getNAICStoBEAAllocation <- function (year, model) {
   # Calculate allocation factors
   AllocationTable$allocation_factor <- AllocationTable$Output/AllocationTable$SumOutput
   # Keep wanted columns
-  AllocationTable <- AllocationTable[, c("NAICS_Code", "BEA_Code", "Location", "allocation_factor")]
+  AllocationTable <- AllocationTable[, c("NAICS_Code", "USEEIO_Code", "Location", "allocation_factor")]
   return(AllocationTable)
 }

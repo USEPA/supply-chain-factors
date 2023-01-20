@@ -58,7 +58,6 @@ mapto2017NAICS <- function(table,model,useeiocodefield,useeionamefield, seffield
   
   # Load in 2012 to 2017 NAICS crosswalk
   naics_12_to_17 <- getNAICS2012to2017Concordances()
-  naics_12_to_17 <- naics_12_to_17[,c("2012 NAICS Code","2017 NAICS Code","2017 NAICS Title")]
   
   # Merge this in with the table
   table <- merge(table,naics_12_to_17, by.x = c("NAICS"), by.y = "2012 NAICS Code")
@@ -78,7 +77,8 @@ mapto2017NAICS <- function(table,model,useeiocodefield,useeionamefield, seffield
   colnames(mapping) <- c("USEEIO_Code","NAICS_Code")
   
   AllocationTable <- getCommodityOutput2NAICSAllocation(2019,mapping,model)
-  # Ma
+  
+  # Merge table of multiple records with allocation factors
   table_mult_alloc <- merge(table_mult,AllocationTable,by.x=c("2017 NAICS Code",useeiocodefield),by.y=c("NAICS_Code","USEEIO_Code"))
   
   # Multiple SEF fields by allocation factor
@@ -90,18 +90,16 @@ mapto2017NAICS <- function(table,model,useeiocodefield,useeionamefield, seffield
     # Insert these back into table_mult after removing
   table_mult <- table_mult[!duplicated(table_mult[,"2017 NAICS Code"]),]
   
-  table_mult[,seffields] <- table_mult_alloc_agg[match(table_mult$`2017 NAICS Code`,table_mult_alloc_agg$Group.1),seffields]
+  # Start table of unique NAICS codes
+  naics_17 <- naics_12_to_17[,c("2017 NAICS Code","2017 NAICS Title")]
+  naics_17 <- naics_17[!duplicated(naics_17),]
+  
+  # Create tables from NAICS 17 adding in factors
+  table_2017 <- merge(naics_17,table_mult_alloc_agg,by.x="2017 NAICS Code",by.y="Group.1")
   
   # Bind uni and mult back together
-  table_2017 <- rbind(table_uni,table_mult)
+  table_2017 <- rbind(table_uni[ ,colnames(table_2017)],table_2017)
   
-  
-  # Check - count 2017 unique NAICS
-  setdiff(unique(naics_12_to_17$`2017 NAICS Code`),table_2017$`2017 NAICS Code`)
-  #one is missing - 331314 - secondary aluminum, which is not a unique commodity in USEEIO; it is an industry
-  
-  # Remove the additional columns up the fields 
-  #table <- table[,-c("NAICS",useeiocodefield,useeionamefield)]
   return(table_2017)
 }
 

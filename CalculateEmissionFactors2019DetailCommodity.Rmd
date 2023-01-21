@@ -60,9 +60,10 @@ colnames(table) <- c(useeiocodefield,
                      seffields) #,
                      #paste("DQ", colnames(DQ)[3:7], "of Factors without Margins"))
 
-# Remove records of all gov and Rest of World adjustment
+# Remove records of all gov, Rest of World adjustment and electricity
 #table <- table[!substr(table[, paste(params$modeltype, "Code")], 1, 1)%in%c("S", "G"), ]
 table <- table[!substr(table[, useeiocodefield], 1, 1)%in%c("S", "G"), ]
+table <- table[!substr(table[, useeiocodefield], 1, 4) == "2211", ]
 
 # Drop 0s
 table <- table[table[,seffields[1]] != 0,]

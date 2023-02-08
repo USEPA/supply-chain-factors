@@ -1,4 +1,4 @@
-Model: "USEEIOv2.1.19-GHG" # 2019 Detail, Commodity
+Model: "USEEIOv2.1.18-GHG" # 2016 Detail, Commodity
 BaseIOSchema: 2012
 BaseIOLevel: "Detail"
 IOYear: &IOYear 2012 # Year for IO data
@@ -16,9 +16,9 @@ SatelliteTable:
     FullName: "Greenhouse Gases"
     Abbreviation: "GHG"
     StaticSource: TRUE
-    StaticFile: "flowsa/flowbysector/GHG_national_2019_m1_v1.3.1_b52879c.parquet"
+    StaticFile: "flowsa/flowbysector/GHG_national_2018_m1_v1.3.1_b52879c.parquet"
     FileLocation: "DataCommons"
-    DataYears: [2019]
+    DataYears: [2018]
     Locations: ["US"]
     SectorListSource: "NAICS" 
     SectorListYear: 2012
@@ -30,7 +30,7 @@ SatelliteTable:
       USEPA_GHG_2022:
         Title: "GHG Inventory"
         Author: "USEPA"
-        DataYear: 2019
+        DataYear: 2018
         URL: "https://www.epa.gov/ghgemissions/inventory-us-greenhouse-gas-emissions-and-sinks-1990-2020"
         Primary: TRUE
 

@@ -5,7 +5,7 @@ output:
     variant: gfm
 ---
 
-Generate supply chain GHG emission factors 2019 NAICS-6 Commodities in CO2-equivalent.
+Generate supply chain GHG emission factors 2019 NAICS-6 Commodities in CO2-equivalent and by gas.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -15,7 +15,7 @@ source("R/utils.R")
 library(useeior)
 library(kableExtra)
 price_adjust_matrices <- c("B", "D", "M", "N", "M_margin", "N_margin")
-#GHGs <- c("Carbon dioxide", "Methane", "Nitrous oxide")
+MajorGHGs <- c("Carbon dioxide", "Methane", "Nitrous oxide")
 dollaryear <- 2019
 modelname <- "USEEIOv2.1.19-GHG"
 checkModelIOYear(modelname)
@@ -35,50 +35,89 @@ for (matrix in price_adjust_matrices) {
 }
 ```
 
-```{r create-EF-table}
-# Create SEF and MEF tables
+```{r}
+
+prepareSEFtable <- function(table, factorform="Scientific Notation") {
+  table[, 1:3] <- table[, c("Sector", "Name", "Flowable")]
+  # Rename columns in table
+  useeiocodefield <- paste(model$specs$CommodityorIndustryType, "Code")
+  useeionamefield <- paste(model$specs$CommodityorIndustryType, "Name")
+  seffields <-  c("Supply Chain Emission Factors without Margins","Margins of Supply Chain Emission Factors",
+  "Supply Chain Emission Factors with Margins")
+  colnames(table) <- c(useeiocodefield,
+                       useeionamefield,
+                       "GHG",
+                       "Unit",
+                       seffields) 
+  # Remove records of all gov, Rest of World adjustment and electricity
+  #table <- table[!substr(table[, paste(params$modeltype, "Code")], 1, 1)%in%c("S", "G"), ]
+  table <- table[!substr(table[, useeiocodefield], 1, 1)%in%c("S", "G"), ]
+  table <- table[!substr(table[, useeiocodefield], 1, 4) == "2211", ]
+  
+  # Drop 0s
+  table <- table[table[,seffields[1]] != 0,]
+  
+  # Associate SEFs with 2017 NAICS-6
+  table <- mapto2017NAICS(table,model,useeiocodefield,useeionamefield,seffields)
+  
+  if (factorform=="Decimal Form") {
+    # Round table values to 3 digits
+    table[, sapply(table, is.numeric)] <- round(table[, sapply(table, is.numeric)], 3)  
+  } else {
+    table[, seffields] <- lapply(table[, seffields],
+                           function(x) scales::scientific(x, 4))
+  }
+  
+  
+  return(table)
+}
+
+```
+
+
+
+Prepare table with 1 factor for All GHGs per commodity in kg CO2e/USD
+```{r}
 SEF_df <- generateEmissionFactorTable(model, price_adjusted_model, margin = FALSE, characterized=TRUE)
 MEF_df <- generateEmissionFactorTable(model, price_adjusted_model, margin = TRUE, characterized=TRUE)
 # Combine SEF and MEF tables
-table <- cbind(SEF_df, MEF_df[, "FlowAmount"], SEF_df[, "FlowAmount"] + MEF_df[, "FlowAmount"])
-#table <- table[table$Flowable%in%c(GHGs, "Other Greenhouse Gases"), ]
-# Add Data Quality
-#DQ <- utils::read.table(paste0("Data Quality/DQ_", modelname, ".csv"), sep = ",",
-#                        header = TRUE, stringsAsFactors = FALSE, check.names = FALSE)
-#table <- merge(table, DQ, by.x = c("Sector", "Flowable"), by.y = c("SectorCode", "Flowable"))
-table[, 1:3] <- table[, c("Sector", "Name", "Flowable")]
-# Rename columns in table
-useeiocodefield <- paste(model$specs$CommodityorIndustryType, "Code")
-useeionamefield <- paste(model$specs$CommodityorIndustryType, "Name")
-seffields <-  c("Supply Chain Emission Factors without Margins","Margins of Supply Chain Emission Factors",
-"Supply Chain Emission Factors with Margins")
-colnames(table) <- c(useeiocodefield,
-                     useeionamefield,
-                     "Substance",
-                     "Unit",
-                     seffields) #,
-                     #paste("DQ", colnames(DQ)[3:7], "of Factors without Margins"))
+df <- cbind(SEF_df, MEF_df[, "FlowAmount"], SEF_df[, "FlowAmount"] + MEF_df[, "FlowAmount"])
 
-# Remove records of all gov, Rest of World adjustment and electricity
-#table <- table[!substr(table[, paste(params$modeltype, "Code")], 1, 1)%in%c("S", "G"), ]
-table <- table[!substr(table[, useeiocodefield], 1, 1)%in%c("S", "G"), ]
-table <- table[!substr(table[, useeiocodefield], 1, 4) == "2211", ]
+# Filter only to include records which used the GWP-AR4-100 indicator
+table_characterized <- df[df$Flowable == "All GHGs", ]
 
-# Drop 0s
-table <- table[table[,seffields[1]] != 0,]
+table_characterized <- prepareSEFtable(table_characterized,factorform="Decimal Form")
 
-# Associate SEFs with 2017 NAICS-6
-table <- mapto2017NAICS(table,model,useeiocodefield,useeionamefield,seffields)
-
-# Round table values to 3 digits
-table[, sapply(table, is.numeric)] <- round(table[, sapply(table, is.numeric)], 3)
+write_to_filename <- paste0("SupplyChainGHGEmissionFactors_NAICS2017_CO2e_", modelname, ".csv")
+write.csv(table_characterized, write_to_filename, row.names = FALSE)
 
 ```
-
-```{r create-table-to-CSV}
-write_to_filename <- paste0("SupplyChainGHGEmissionFactors_NAICS2017_", modelname, ".csv")
-write.csv(table, write_to_filename, row.names = FALSE)
-```
-
 Saved `r write_to_filename`.
+
+Prepare table with factors for each GHG and minor GHGs in kg CO2e/USD
+```{r create-table-to-CSV}
+SEF_df <- generateEmissionFactorTable(model, price_adjusted_model, margin = FALSE, characterized=FALSE)
+MEF_df <- generateEmissionFactorTable(model, price_adjusted_model, margin = TRUE, characterized=FALSE)
+
+df_un <- cbind(SEF_df, MEF_df[, "FlowAmount"], SEF_df[, "FlowAmount"] + MEF_df[, "FlowAmount"])
+
+df <- rbind(df,df_un)
+
+table_major_minor <- df[df$Flowable%in%c(MajorGHGs, "Minor GHGs"), ]
+
+table_major_minor<- prepareSEFtable(table_major_minor,factorform="Scientific Notation")
+
+
+```
+Saved `r write_to_filename`.
+
+Prepare table with factors for each GHG in kg gas/USD
+```{r}
+table_by_gas <- df_un
+table_by_gas <- prepareSEFtable(table_by_gas)
+
+write_to_filename <- paste0("SupplyChainGHGEmissionFactors_NAICS2017_byGHG_", modelname, ".csv")
+write.csv(table_by_gas, write_to_filename, row.names = FALSE)
+
+```
 

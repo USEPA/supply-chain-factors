@@ -24,9 +24,12 @@ generateEmissionFactorTable <- function(model, price_adjusted_model, margin = FA
   }
   
   if(characterized) {
-    df <- as.data.frame(price_adjusted_model[[N_matrix]])["GWP-AR4-100", ]
-    df$Flowable <- "CO2e"
-    df$Unit <- paste0("kg/", dollaryear, " USD",", purchaser price")  
+    df <- as.data.frame(price_adjusted_model[[N_matrix]])#["GWP-AR4-100", ]
+    
+    flowableforind <- data.frame(Flowable=c("All GHGs","Minor GHGs"),Indicator=c("GWP-AR4-100","Other Greenhouse Gases"))
+    df <- merge(df,flowableforind,by.x = 0, by.y="Indicator")
+    df <- subset(df,select=-c(Row.names))
+    df$Unit <- paste0("kg CO2e/", dollaryear, " USD",", purchaser price")  
   } else {
     
     df <- rbind(as.data.frame(price_adjusted_model[[M_matrix]],
@@ -75,24 +78,25 @@ mapto2017NAICS <- function(table,model,useeiocodefield,useeionamefield, seffield
   # Merge this in with the table
   table <- merge(table,naics_12_to_17, by.x = c("NAICS"), by.y = "2012 NAICS Code")
   
-  # Filter out rows where both NAICS 2017 and the SEF valuese are repeated
+  #drop NAICS 2012 info
+  table <- subset(table,select=-c(NAICS,`Commodity Name`,`2012 NAICS Title`))
+  
+  # Filter out rows where both NAICS 2017 and the SEF values are repeated
   table <- table[!duplicated(table[,c(seffields,"2017 NAICS Code")]),]
   
   # First create a mapping between NAICS and model codes
   mapping <- table[,c(useeiocodefield,"2017 NAICS Code")]
+  mapping <- mapping[!duplicated(mapping),]
   colnames(mapping) <- c("USEEIO_Code","NAICS_Code")
   
   # Multiple records for NAICS 17 exist where factors are unique - separate these out
-  table_mult <- table[duplicated(table[,"2017 NAICS Code"]) | duplicated(table[,"2017 NAICS Code"], fromLast = TRUE),]
+  table_mult <- table[duplicated(table[,c("GHG","Unit","2017 NAICS Code")]) | duplicated(table[,c("GHG","Unit","2017 NAICS Code")], fromLast = TRUE),]
   
   # Get the rows where NAICS 2017 factors are unique (rest of table)
   table_uni <- table[setdiff(rownames(table),rownames(table_mult)),]
   
   # For NAICS 2017 with multiple factors, use output to calculate a weighted average
-   AllocationTable <- getCommodityOutput2NAICSAllocation(2019,mapping,model)
-  
-  # Drop NAICS 2012 data columns before merging back in. This will prevent rows where 2012 codes
-  table_mult <- subset(table_mult, select=-c(NAICS,`2012 NAICS Title`))
+  AllocationTable <- getCommodityOutput2NAICSAllocation(2019,mapping,model)
   
   # Merge table of multiple records with allocation factors
   table_mult_alloc <- merge(table_mult,AllocationTable,by.x=c("2017 NAICS Code",useeiocodefield),by.y=c("NAICS_Code","USEEIO_Code"))
@@ -101,14 +105,15 @@ mapto2017NAICS <- function(table,model,useeiocodefield,useeionamefield, seffield
   table_mult_alloc[,seffields] <- lapply(table_mult_alloc[, seffields], function(x,y) x * y, y = table_mult_alloc$allocation_factor)
   
   # Aggregate factors by NAICS 2017
-  table_mult_alloc_agg <- aggregate(table_mult_alloc[,seffields], by = list(table_mult_alloc$`2017 NAICS Code`), sum)
+  table_mult_alloc_agg <- aggregate(table_mult_alloc[,seffields], by = list(table_mult_alloc$`2017 NAICS Code`,table_mult_alloc$GHG,table_mult_alloc$Unit), sum)
+  colnames(table_mult_alloc_agg) <- c("2017 NAICS Code","GHG","Unit",seffields)
   
   # Start table of unique NAICS codes
   naics_17 <- naics_12_to_17[,c("2017 NAICS Code","2017 NAICS Title")]
   naics_17 <- naics_17[!duplicated(naics_17),]
   
   # Create tables from NAICS 17 adding in factors
-  table_2017 <- merge(naics_17,table_mult_alloc_agg,by.x="2017 NAICS Code",by.y="Group.1")
+  table_2017 <- merge(naics_17,table_mult_alloc_agg,by="2017 NAICS Code")
   
   # Bind uni and mult back together
   table_2017 <- rbind(table_uni[ ,colnames(table_2017)],table_2017)

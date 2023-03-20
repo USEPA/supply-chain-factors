@@ -1,16 +1,12 @@
 # Supply Chain Factors Format specifications
 
-| Field Name                                              | Definition |
-| ------------------------------------------------------ | ---------- |
-| Commodity/Industry Code                                | Code of the commodity or industry from the BEA Make and Use Tables 2012 categorization. 'Detail' and 'summary' are two levels of detail BEA publishes economic input-output accounts data at. 'Detail' level is the most resolved categorization and includes 405 commodity or industry sectors. 'Summary' level is a categorization with medium resolution and includes 73 commodity and 71 industry sectors. |
-| Commodity/Industry Name                                | Name of the commodity or industry from the BEA Make and Use Tables 2012 categorization, except detail commodities, which use USEEIO v1.1 names, see [USEEIO v1.1 Matrices](http://doi.org/10.23719/1369615) |
-| Substance                                              | Greenhouse gas: 'Carbon dioxide' is CO2; 'Methane' is CH4; 'Nitrous oxide' is N2O; and 'Other Greenhouse Gases' include HFC-23, HFC-32, HFC-125, HFC-134a, HFC-143a, HFC-236fa, CF4, C2F6, C3F8, C4F8, SF6, and NF3. |
-| Unit                                                   | Unit of emission factors for each gas. 'Other GHGs' are aggregated and reported in CO2e (carbon dioxide equivalents) using the IPCC AR4 100-year GWP factors. Purchaser price is the price paid by the consumer and equals to the producer prices plus any associated margin, which generally include distribution, wholesale and retail costs. |
-| Supply Chain Emission Factors without Margins          | Direct and indirect GHG emissions associated with production of commodity or industry from cradle to the point of production(kg) per 2018 USD of that commodity or industry in the US in purchaser price. |
-| Margins of Supply Chain Emission Factors               | Direct and indirect GHG emissions associated with production of commodity or industry from the point of production to the point of sale (kg) per 2018 USD of that commodity or industry in the US in purchaser price of that commodity or industry in the US. |
-| Supply Chain Emission Factors with Margins             | Direct and indirect GHG emissions associated with production of commodity or industry from cradle to the point of sale(kg) per 2018 USD of that commodity or industry in purchaser price of that commodity or industry in the US. |
-| DQ ReliabilityScore of Factors without Margins         | Data reliability scores for model results using USEPA 2016 Data quality assessment system, where 1 is the better quality and 5 the poorer quality. |
-| DQ TemporalCorrelation of Factors without Margin       | Data technological correlation scores for model results using USEPA 2016 Data quality assessment system, where 1 is the better quality and 5 the poorer quality. |
-| DQ GeographicalCorrelation of Factors without Margins  | Data collection scores for model results using USEPA 2016 Data quality assessment system, where 1 is the better quality and 5 the poorer quality. |
-| DQ TechnologicalCorrelation of Factors without Margins | Data geographical correlatoin scores for model results using USEPA 2016 Data quality assessment system, where 1 is the better quality and 5 the poorer quality. |
-| DQ DataCollection of Factors without Margins           | Data temporal correlation scores for model results using USEPA 2016 Data quality assessment system, where 1 is the better quality and 5 the poorer quality. |
+Field Name | Definition
+--- | ---
+2017 NAICS Code | The [2017 North American Industry Classification Code](https://www.census.gov/naics/?58967?yearbck=2017) for the Factor
+2017 NAICS Title | The [2017 North American Industry Classification Desciption](https://www.census.gov/naics/?58967?yearbck=2017) for the Factor
+GHG | Greenhouse Gas name
+Unit | A Metric System Unit
+Supply Chain Emission Factors without Margins | Direct and indirect GHG emission intensity associated with production of commodity from cradle to the point of production
+Margins of Supply Chain Emission Factors | Direct and indirect GHG emissions associated with production of   commodity from the point of production to the point of sale
+Supply Chain Emission Factors with Margins | Direct and indirect GHG emissions associated with production of commodity from cradle to the point of sale
+Reference USEEIO Code | Unique Code for [USEEIO v2.0](https://edg.epa.gov/metadata/catalog/search/resource/details.page?uuid=%7B487BC831-778F-461B-B74C-1A2CAE14CDD9%7D) commodity

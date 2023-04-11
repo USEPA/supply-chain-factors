@@ -3,6 +3,12 @@ title: "Supply Chain GHG Emission Factors for 2019 NAICS-6 Commodities"
 output:
   md_document:
     variant: gfm
+params:
+  dollaryear:
+    label: "Output Dollar Year"
+    value: 2019
+    input: select
+    choices: [2016, 2017, 2018, 2019, 2020, 2021]
 ---
 
 Generate supply chain GHG emission factors 2019 NAICS-6 Commodities in CO2-equivalent and by gas.
@@ -16,7 +22,7 @@ library(useeior)
 library(kableExtra)
 price_adjust_matrices <- c("B", "D", "M", "N", "M_margin", "N_margin")
 MajorGHGs <- c("Carbon dioxide", "Methane", "Nitrous oxide")
-dollaryear <- 2019
+dollaryear <- params$dollaryear
 modelname <- "USEEIOv2.1.19-GHG"
 checkModelIOYear(modelname)
 ```

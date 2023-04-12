@@ -35,7 +35,7 @@ install.packages("rmarkdown")
 rmarkdown::render("CalculateEmissionFactors.Rmd", params = "ask")
 ```
 
-In both cases a comma-separated file of the supply chain factors will be written out in the main folder of the project, with a name like *SupplyChainGHGEmissionFactors_{USEEIOmodelname}.csv* where the *USEEIOmodelname* is based on the options selected by the user and matches one of the [model specifications](model-specs/) stored in this project.
+In both cases a comma-separated file of the supply chain factors will be written out in the main folder of the project, with a name like *SupplyChainGHGEmissionFactors_[...].csv* based on the options selected by the user and matches one of the [model specifications](model-specs/) stored in this project.
 The fields used to defined data are described in the [format specifications](format-specs/) and are identical to the fields used in the [original Supply Chain Factors dataset releases](https://cfpub.epa.gov/si/si_public_record_Report.cfm?dirEntryId=349324) A markdown file, CalculateEmissionFactors.md, is automatically generated during execution, but it contains no original content.
 
 # Disclaimer

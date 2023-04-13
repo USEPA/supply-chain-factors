@@ -97,7 +97,6 @@ table_characterized <- prepareSEFtable(table_characterized,factorform="Decimal F
 
 write_to_filename <- paste0("SupplyChainGHGEmissionFactors_",SEFversion,"_NAICS_CO2e_USD", dollaryear, ".csv")
 write.csv(table_characterized, write_to_filename, row.names = FALSE, fileEncoding = "UTF-8")
-
 ```
 Saved `r write_to_filename`.
 

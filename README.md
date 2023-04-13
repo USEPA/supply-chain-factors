@@ -1,11 +1,19 @@
 # Supply Chain GHG Emission Factors
-
 Code to produce the most recent version of the [Supply Chain GHG
-Emission
-Factors](https://cfpub.epa.gov/si/si_public_record_Report.cfm?dirEntryId=349324).
+Emission Factors](https://cfpub.epa.gov/si/si_public_record_Report.cfm?dirEntryId=349324).
 Code to produce older versions can be found in [releases](/releases),
 where the release version number corresponds with Supply Chain GHG
 Emission Factors dataset version.
+
+Watch this [EPA webinar](https://www.youtube.com/watch?v=pJ8gvZPdcgc) to
+understand how to produce the Factors and how to use them for
+organizational GHG reporting.
+
+Check out
+[Discussions](https://github.com/USEPA/supply-chain-factors/discussions)
+for FAQs. If you don’t see your questions in it, feel free to post them.
+If you want answer a posted question or add comments to a question, you
+are welcome to submit them.
 
 ## Software and Hardware Requirements
 
@@ -28,9 +36,9 @@ Emission Factors dataset version.
 
 ## Usage
 
-The code in this package can be used to generate the USEEIO-based Supply
-Chain GHG Emission Factors, based on options selected by the user at
-run-time.
+The code in this repository can be used to generate the USEEIO-based
+Supply Chain GHG Emission Factors, based on options selected by the user
+at run-time.
 
 If users choose to download a zip file of the code, they can unzip the
 file then [create a project from the existing directory within

@@ -1,13 +1,15 @@
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
 # Supply Chain GHG Emission Factors
 
-Code to produce the [Supply Chain GHG Emission
+Code to produce the most recent version of the [Supply Chain GHG
+Emission
 Factors](https://cfpub.epa.gov/si/si_public_record_Report.cfm?dirEntryId=349324).
+Code to produce older versions can be found in [releases](/releases),
+where the release version number corresponds with Supply Chain GHG
+Emission Factors dataset version.
 
 ## Software and Hardware Requirements
 
-1.  [R](https://www.r-project.org/) software, version >= 3.6
+1.  [R](https://www.r-project.org/) software, version \>= 3.6
 2.  A Windows, Mac, or Linux computer with an Internet connection and
     permissions set to install R packages and write files to a local
     project folder.
@@ -52,15 +54,12 @@ rmarkdown::render("CalculateEmissionFactors.Rmd", params = "ask")
 
 In both cases a comma-separated file of the supply chain factors will be
 written out in the main folder of the project, with a name like
-*SupplyChainGHGEmissionFactors\_{USEEIOmodelname}.csv* where the
-*USEEIOmodelname* is based on the options selected by the user and
-matches one of the [model specifications](model-specs/) stored in this
-project. The fields used to defined data are described in the [format
-specifications](format-specs/) and are identical to the fields used in
-the [original Supply Chain Factors dataset
-releases](https://cfpub.epa.gov/si/si_public_record_Report.cfm?dirEntryId=349324)
-A markdown file, CalculateEmissionFactors.md, is automatically generated
-during execution, but it contains no original content.
+*SupplyChainGHGEmissionFactors\_\[…\].csv* based on the options selected
+by the user and matches one of the [model specifications](model-specs/)
+stored in this project. The fields used to defined data are described in
+the [format specifications](format-specs/). A markdown file,
+CalculateEmissionFactors.md, is automatically generated during
+execution, but it contains no original content.
 
 # Disclaimer
 

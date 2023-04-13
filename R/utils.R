@@ -1,8 +1,9 @@
-#' Get the SEF version specified in the yaml file
+#' Get the latest SEF version specified in the yaml file
 #' @return string, version name
-get_SEF_version <- function() {
+get_latest_SEF_version <- function() {
   versioning <- configr::read.config(here::here("Versioning.yml"))
-  return(names(versioning[1])[1])
+  v <- names(versioning[length(versioning)])[1]
+  return(v)
 }
 
 #' Install useeior (via devtools) for specified SEF version.

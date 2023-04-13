@@ -6,17 +6,19 @@ output:
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+Directory of model specifications and disaggregation specifications for these models.
+The waste disaggregation specification files are the same as those founds in [useeior's diaggspecs](https://github.com/USEPA/useeior/tree/5e564aad45a528551288e25b95f009d1d761b841/inst/extdata/disaggspecs) and used in USEEIO v2.0.1-411, described in the [USEEIO v2.0 paper](https://www.nature.com/articles/s41597-022-01293-7), but are included here for convenience.
+
 ## Model Descriptions
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 source("R/utils.R")
-install_useeior(SEF_version = "v1.1.1")
 library(useeior)
 library(kableExtra)
 ```
 
 ```{r model-summary, include=FALSE}
-model_specs <- list.files("model-specs")[endsWith(list.files("model-specs"), "yml")]
+model_specs <- list.files("model-specs")[endsWith(list.files("model-specs"), "GHG.yml")]
 ModelSummary <- data.frame()
 for (modelname in sub(".yml", "", model_specs)) {
   model <- useeior:::initializeModel(modelname,

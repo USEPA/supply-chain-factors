@@ -72,7 +72,7 @@ prepareSEFtable <- function(table, factorform="Scientific Notation") {
     table[, sapply(table, is.numeric)] <- round(table[, sapply(table, is.numeric)], 3)  
   } else {
     table[, seffields] <- lapply(table[, seffields],
-                           function(x) scales::scientific(x, 4))
+                           function(x) scales::scientific(x, 3))
   }
   
   
@@ -96,12 +96,12 @@ table_characterized <- df[df$Flowable == "All GHGs", ]
 table_characterized <- prepareSEFtable(table_characterized,factorform="Decimal Form")
 
 write_to_filename <- paste0("SupplyChainGHGEmissionFactors_",SEFversion,"_NAICS_CO2e_USD", dollaryear, ".csv")
-write.csv(table_characterized, write_to_filename, row.names = FALSE)
+write.csv(table_characterized, write_to_filename, row.names = FALSE, fileEncoding = "UTF-8")
 
 ```
 Saved `r write_to_filename`.
 
-Prepare table with factors for each GHG and minor GHGs in kg CO2e/USD
+Prepare table with factors for each GHG in kg gas/USD
 ```{r create-table-to-CSV}
 SEF_df <- generateEmissionFactorTable(model, price_adjusted_model, margin = FALSE, characterized=FALSE)
 MEF_df <- generateEmissionFactorTable(model, price_adjusted_model, margin = TRUE, characterized=FALSE)
@@ -110,21 +110,15 @@ df_un <- cbind(SEF_df, MEF_df[, "FlowAmount"], SEF_df[, "FlowAmount"] + MEF_df[,
 
 df <- rbind(df,df_un)
 
-table_major_minor <- df[df$Flowable%in%c(MajorGHGs, "Minor GHGs"), ]
+table_by_gas <- df_un
+table_by_gas <- prepareSEFtable(table_by_gas)
 
-table_major_minor<- prepareSEFtable(table_major_minor,factorform="Scientific Notation")
+write_to_filename <- paste0("SupplyChainGHGEmissionFactors_",SEFversion,"_NAICS_byGHG_USD", dollaryear,".csv")
+write.csv(table_by_gas, write_to_filename, row.names = FALSE, fileEncoding = "UTF-8")
 
 
 ```
 Saved `r write_to_filename`.
 
-Prepare table with factors for each GHG in kg gas/USD
-```{r}
-table_by_gas <- df_un
-table_by_gas <- prepareSEFtable(table_by_gas)
 
-write_to_filename <- paste0("SupplyChainGHGEmissionFactors_",SEFversion,"_NAICS_byGHG_USD", dollaryear,".csv")
-write.csv(table_by_gas, write_to_filename, row.names = FALSE)
-
-```
 

@@ -1,7 +1,7 @@
 # Supply Chain GHG Emission Factors
 Code to produce the most recent version of the [Supply Chain GHG
 Emission Factors](https://cfpub.epa.gov/si/si_public_record_Report.cfm?dirEntryId=349324).
-Code to produce older versions can be found in [releases](/releases),
+Code to produce older versions can be found in [releases](https://github.com/USEPA/supply-chain-factors/releases),
 where the release version number corresponds with Supply Chain GHG
 Emission Factors dataset version.
 

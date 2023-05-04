@@ -35,7 +35,8 @@ generateEmissionFactorTable <- function(model, price_adjusted_model, margin = FA
     df <- rbind(as.data.frame(price_adjusted_model[[M_matrix]],
                               row.names = gsub("/.*", "", rownames(price_adjusted_model[[M_matrix]]))))
     df$Flowable <- rownames(df) 
-    df$Unit <- paste0("kg/", dollaryear, " USD",", purchaser price")  
+    df <- merge(df, model$SatelliteTables$flows[c("Flowable", "Unit")], by="Flowable", all.x=TRUE, sort=FALSE)
+    df$Unit <- sapply(df$Unit, function(x) paste0(x, "/", dollaryear, " USD",", purchaser price"))  
   }
 
   

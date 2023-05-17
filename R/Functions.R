@@ -120,7 +120,7 @@ mapto2017NAICS <- function(table,model,useeiocodefield,useeionamefield, seffield
   table_2017 <- rbind(table_uni[ ,colnames(table_2017)],table_2017)
 
   # Aggregate mapping to show all USEEIO codes by NAICS
-  m <- aggregate(mapping[,"USEEIO_Code"], by = list(mapping$NAICS_Code), drop=FALSE, paste, collapse = ",") 
+  m <- aggregate(mapping[,"USEEIO_Code"], by = list(mapping$NAICS_Code), drop=FALSE, paste, collapse = ", ") 
   colnames(m) <- c("2017 NAICS Code", "Reference USEEIO Code")
   
   # Add mapping back in to keep useeio code along with factors as a reference

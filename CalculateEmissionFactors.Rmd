@@ -30,7 +30,7 @@ checkModelIOYear(modelname)
 
 ```{r build-model, include=FALSE}
 # Build model
-modelconfigfile <- c(paste0("model-specs/", modelname, ".yml"),"model-specs/WasteDisaggregationDetail.yml")
+modelconfigfile <- c(paste0("model-specs/", modelname, ".yml"))
 model <- buildModel(modelname, configpaths=modelconfigfile)
 # Calculate margin impacts for M and N matrices
 model <- c(model, calculateMarginSectorImpacts(model))

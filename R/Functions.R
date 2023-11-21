@@ -80,8 +80,8 @@ mapto2017NAICS <- function(table,model,useeiocodefield,useeionamefield, seffield
   table <- merge(table,naics_12_to_17, by.x = c("NAICS"), by.y = "2012 NAICS Code")
   
   #drop NAICS 2012 info
-  table <- subset(table,select=-c(NAICS,`Commodity Name`,`2012 NAICS Title`))
-  
+  table <- table[, !(names(table) %in% c("NAICS", useeionamefield, "2012 NAICS Title"))]
+
   # Filter out rows where both NAICS 2017 and the SEF values are repeated
   table <- table[!duplicated(table[,c(seffields,"2017 NAICS Code")]),]
   
@@ -120,7 +120,7 @@ mapto2017NAICS <- function(table,model,useeiocodefield,useeionamefield, seffield
   table_2017 <- rbind(table_uni[ ,colnames(table_2017)],table_2017)
 
   # Aggregate mapping to show all USEEIO codes by NAICS
-  m <- aggregate(mapping[,"USEEIO_Code"], by = list(mapping$NAICS_Code), drop=FALSE, paste, collapse = ",") 
+  m <- aggregate(mapping[,"USEEIO_Code"], by = list(mapping$NAICS_Code), drop=FALSE, paste, collapse = ", ") 
   colnames(m) <- c("2017 NAICS Code", "Reference USEEIO Code")
   
   # Add mapping back in to keep useeio code along with factors as a reference

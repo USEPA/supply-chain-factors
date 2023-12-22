@@ -15,6 +15,8 @@ for FAQs. If you don’t see your questions in it, feel free to post them.
 If you want answer a posted question or add comments to a question, you
 are welcome to submit them.
 
+Note that this site is NOT intended to provide guidance on GHG reporting, but rather a resource that might be used in a an estimation of GHG emissions from purchased goods and services.
+
 ## Software and Hardware Requirements
 
 1.  [R](https://www.r-project.org/) software, version \>= 3.6

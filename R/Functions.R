@@ -24,9 +24,8 @@ generateEmissionFactorTable <- function(model, price_adjusted_model, margin = FA
   }
   
   if(characterized) {
-    df <- as.data.frame(price_adjusted_model[[N_matrix]])#["GWP-AR4-100", ]
-    
-    flowableforind <- data.frame(Flowable=c("All GHGs","Minor GHGs"),Indicator=c("GWP-AR4-100","Other Greenhouse Gases"))
+    df <- as.data.frame(price_adjusted_model[[N_matrix]])
+    flowableforind <- data.frame(Flowable=c("All GHGs"),Indicator=c("Greenhouse Gases"))
     df <- merge(df,flowableforind,by.x = 0, by.y="Indicator")
     df <- subset(df,select=-c(Row.names))
     df$Unit <- paste0("kg CO2e/", dollaryear, " USD",", purchaser price")  
@@ -74,41 +73,42 @@ mapto2017NAICS <- function(table,model,useeiocodefield,useeionamefield, seffield
   table <- merge(table,xwalk, by.x = c(useeiocodefield), by.y = "USEEIO")
   
   # Load in 2012 to 2017 NAICS crosswalk
-  naics_12_to_17 <- getNAICS2012to2017Concordances()
+  #naics_12_to_17 <- getNAICS2012to2017Concordances()
 
   # Merge this in with the table
-  table <- merge(table,naics_12_to_17, by.x = c("NAICS"), by.y = "2012 NAICS Code")
+  #table <- merge(table,naics_12_to_17, by.x = c("NAICS"), by.y = "2012 NAICS Code")
   
   #drop NAICS 2012 info
-  table <- table[, !(names(table) %in% c("NAICS", useeionamefield, "2012 NAICS Title"))]
+  #table <- table[, !(names(table) %in% c("NAICS", useeionamefield, "2012 NAICS Title"))]
 
   # Filter out rows where both NAICS 2017 and the SEF values are repeated
-  table <- table[!duplicated(table[,c(seffields,"2017 NAICS Code")]),]
+  #table <- table[!duplicated(table[,c(seffields,"NAICS")]),]
   
   # First create a mapping between NAICS and model codes
-  mapping <- table[,c(useeiocodefield,"2017 NAICS Code")]
+  mapping <- table[,c(useeiocodefield,"NAICS")]
   mapping <- mapping[!duplicated(mapping),]
   colnames(mapping) <- c("USEEIO_Code","NAICS_Code")
   
   # Multiple records for NAICS 17 exist where factors are unique - separate these out
-  table_mult <- table[duplicated(table[,c("GHG","Unit","2017 NAICS Code")]) | duplicated(table[,c("GHG","Unit","2017 NAICS Code")], fromLast = TRUE),]
+  table_mult <- table[duplicated(table[,c("GHG","Unit","NAICS")]) | duplicated(table[,c("GHG","Unit","NAICS")], fromLast = TRUE),]
   
   # Get the rows where NAICS 2017 factors are unique (rest of table)
   table_uni <- table[setdiff(rownames(table),rownames(table_mult)),]
   
   # For NAICS 2017 with multiple factors, use output to calculate a weighted average
-  AllocationTable <- getCommodityOutput2NAICSAllocation(2019,mapping,model)
+  AllocationTable <- getCommodityOutput2NAICSAllocation(dollaryear,mapping,model)
   
   # Merge table of multiple records with allocation factors
-  table_mult_alloc <- merge(table_mult,AllocationTable,by.x=c("2017 NAICS Code",useeiocodefield),by.y=c("NAICS_Code","USEEIO_Code"))
+  table_mult_alloc <- merge(table_mult,AllocationTable,by.x=c("NAICS",useeiocodefield),by.y=c("NAICS_Code","USEEIO_Code"))
   
   # Multiple SEF fields by allocation factor
   table_mult_alloc[,seffields] <- lapply(table_mult_alloc[, seffields], function(x,y) x * y, y = table_mult_alloc$allocation_factor)
   
   # Aggregate factors by NAICS 2017
-  table_mult_alloc_agg <- aggregate(table_mult_alloc[,seffields], by = list(table_mult_alloc$`2017 NAICS Code`,table_mult_alloc$GHG,table_mult_alloc$Unit), sum)
-  colnames(table_mult_alloc_agg) <- c("2017 NAICS Code","GHG","Unit",seffields)
-  
+  table_mult_alloc_agg <- aggregate(table_mult_alloc[,seffields], by = list(table_mult_alloc$`NAICS`,table_mult_alloc$GHG,table_mult_alloc$Unit), sum)
+  colnames(table_mult_alloc_agg) <- c("NAICS","GHG","Unit",seffields)
+
+  [!stop editing]
   # Start table of unique NAICS codes
   naics_17 <- naics_12_to_17[,c("2017 NAICS Code","2017 NAICS Title")]
   naics_17 <- naics_17[!duplicated(naics_17),]
@@ -129,30 +129,7 @@ mapto2017NAICS <- function(table,model,useeiocodefield,useeionamefield, seffield
   return(table_2017)
 }
 
-#' Loads the Census NAICS 2012 to 2017 crosswalk if not already present
-#' Repurposed from useeior package 
-#' Original at https://github.com/USEPA/useeior/blob/6e6b2a6c73efce8a077af76857da71cae8b4bdbf/R/CrosswalkFunctions.R#L217
-getNAICS2012to2017Concordances <- function() {
-  filename <- "2012_to_2017_NAICS.xlsx"
-  if(!file.exists(filename)) {
-    utils::download.file("https://www.census.gov/naics/concordances/2012_to_2017_NAICS.xlsx",
-                         filename, mode = "wb")
-  }
-  df <- as.data.frame(readxl::read_excel(filename, sheet = 1, col_names = TRUE, skip = 2))
-  df <- df[, startsWith(colnames(df), "20")]
-  # Colname for 2012 NAICS name is"2012 NAICS Title\r\n(and specific piece of the 2012 industry that is contained in the 2017 industry)". Simplify it
-  colnames(df)[2] <- "2012 NAICS Title"
-  return(df)
-}
 
-
-#' Determine allocation factors between given NAICS and model sectors based on commodity output.
-#' Slightly modified from https://github.com/USEPA/useeior/blob/6e6b2a6c73efce8a077af76857da71cae8b4bdbf/R/CrosswalkFunctions.R#L15
-#' Changes: Use given Just filter for 6-digit NAICS; use commodity output in place of industry output 
-#' @param model A complete EEIO model: a list with USEEIO model components and attributes.
-#' @param model A mappings with fields USEEIO_Code and NAICS_Code between given model codes and given NAICS codes
-#' @param year Year of model output.
-#' @return A table of allocation factors for NAICS sectors for each model sector contributing to NAICS.
 getCommodityOutput2NAICSAllocation <- function (year, mapping, model) {
   
   # Get output table for given year

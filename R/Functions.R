@@ -72,8 +72,6 @@ mapto2017NAICS <- function(table,model,useeiocodefield,useeionamefield, seffield
   
   table <- merge(table,xwalk, by.x = c(useeiocodefield), by.y = "USEEIO")
   
-  # Load in 2012 to 2017 NAICS crosswalk
-  #naics_12_to_17 <- getNAICS2012to2017Concordances()
 
   # Merge this in with the table
   #table <- merge(table,naics_12_to_17, by.x = c("NAICS"), by.y = "2012 NAICS Code")
@@ -97,7 +95,7 @@ mapto2017NAICS <- function(table,model,useeiocodefield,useeionamefield, seffield
   
   # For NAICS 2017 with multiple factors, use output to calculate a weighted average
   AllocationTable <- getCommodityOutput2NAICSAllocation(dollaryear,mapping,model)
-  
+   
   # Merge table of multiple records with allocation factors
   table_mult_alloc <- merge(table_mult,AllocationTable,by.x=c("NAICS",useeiocodefield),by.y=c("NAICS_Code","USEEIO_Code"))
   
@@ -108,17 +106,16 @@ mapto2017NAICS <- function(table,model,useeiocodefield,useeionamefield, seffield
   table_mult_alloc_agg <- aggregate(table_mult_alloc[,seffields], by = list(table_mult_alloc$`NAICS`,table_mult_alloc$GHG,table_mult_alloc$Unit), sum)
   colnames(table_mult_alloc_agg) <- c("NAICS","GHG","Unit",seffields)
 
-  [!stop editing]
-  # Start table of unique NAICS codes
-  naics_17 <- naics_12_to_17[,c("2017 NAICS Code","2017 NAICS Title")]
+  # Combine table with multiple records now aggregated back with table of unique values
+  table_2017 <- rbind(table_uni[ ,colnames(table_mult_alloc_agg)],table_mult_alloc_agg)
+ 
+  # Load in 2012 to 2017 NAICS crosswalk to get NAICS 2017 names
+  naics_17 <- getNAICS2012to2017Concordances()[,c("2017 NAICS Code","2017 NAICS Title")]
   naics_17 <- naics_17[!duplicated(naics_17),]
   
   # Create tables from NAICS 17 adding in factors
-  table_2017 <- merge(naics_17,table_mult_alloc_agg,by="2017 NAICS Code")
+  table_2017 <- merge(naics_17,table_2017,by.x="2017 NAICS Code",by.y="NAICS")
   
-  # Bind uni and mult back together
-  table_2017 <- rbind(table_uni[ ,colnames(table_2017)],table_2017)
-
   # Aggregate mapping to show all USEEIO codes by NAICS
   m <- aggregate(mapping[,"USEEIO_Code"], by = list(mapping$NAICS_Code), drop=FALSE, paste, collapse = ", ") 
   colnames(m) <- c("2017 NAICS Code", "Reference USEEIO Code")
@@ -129,6 +126,21 @@ mapto2017NAICS <- function(table,model,useeiocodefield,useeionamefield, seffield
   return(table_2017)
 }
 
+#' Loads the Census NAICS 2012 to 2017 crosswalk if not already present
+#' Repurposed from useeior package 
+#' Original at https://github.com/USEPA/useeior/blob/6e6b2a6c73efce8a077af76857da71cae8b4bdbf/R/CrosswalkFunctions.R#L217
+getNAICS2012to2017Concordances <- function() {
+  filename <- "2012_to_2017_NAICS.xlsx"
+  if(!file.exists(filename)) {
+    utils::download.file("https://www.census.gov/naics/concordances/2012_to_2017_NAICS.xlsx",
+                         filename, mode = "wb")
+  }
+  df <- as.data.frame(readxl::read_excel(filename, sheet = 1, col_names = TRUE, skip = 2))
+  df <- df[, startsWith(colnames(df), "20")]
+  # Colname for 2012 NAICS name is"2012 NAICS Title\r\n(and specific piece of the 2012 industry that is contained in the 2017 industry)". Simplify it
+  colnames(df)[2] <- "2012 NAICS Title"
+  return(df)
+}
 
 getCommodityOutput2NAICSAllocation <- function (year, mapping, model) {
   

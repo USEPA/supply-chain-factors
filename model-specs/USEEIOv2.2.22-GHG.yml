@@ -1,4 +1,4 @@
-Model: "USEEIOv3.0.22-GHG" # 2022 Detail, Commodity
+Model: "USEEIOv2.2.22-GHG" # 2022 Detail, Commodity
 BaseIOSchema: 2017
 BaseIOLevel: "Detail"
 IOYear: 2017 # Year for IO data

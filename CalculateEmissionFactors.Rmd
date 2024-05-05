@@ -20,7 +20,7 @@ library(kableExtra)
 price_adjust_matrices <- c("B", "D", "M", "N", "M_margin", "N_margin")
 MajorGHGs <- c("Carbon dioxide", "Methane", "Nitrous oxide")
 dollaryear <- params$dollaryear
-modelname <- "USEEIOv3.0.22-GHG"
+modelname <- "USEEIOv2.2.22-GHG"
 checkModelIOYear(modelname)
 ```
 

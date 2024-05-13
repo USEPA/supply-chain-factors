@@ -1,6 +1,7 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
+  pull_request:
   push:
     # branches: [main, dev]
     paths-ignore:
@@ -8,6 +9,8 @@ on:
       - 'LICENSE'
       - '.gitignore'
       - '.gitattributes'
+  workflow_dispatch:  # also allow manual trigger, for testing purposes
+
 
 name: Test factor build
 
@@ -24,7 +27,10 @@ jobs:
 
       - uses: r-lib/actions/setup-r@v2
 
-      - name: Render Rmarkdown file
+      - name: Install supporting packages
         run: |
-          Rscript -e 'install.packages(c("knitr", "rmarkdown", "cli", "configr", "scales"))'
+          Rscript -e 'install.packages(c("knitr", "rmarkdown", "cli", "configr", "scales", "here"))'
+
+      - name: Build factors
+        run: |
           Rscript -e 'rmarkdown::render(input = "CalculateEmissionFactors.Rmd")'

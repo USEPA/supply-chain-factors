@@ -26,5 +26,5 @@ jobs:
 
       - name: Render Rmarkdown file
         run: |
-          Rscript -e 'install.packages(c("knitr", "rmarkdown"))'
+          Rscript -e 'install.packages(c("knitr", "rmarkdown", "cli", "configr", "scales"))'
           Rscript -e 'rmarkdown::render(input = "CalculateEmissionFactors.Rmd")'

@@ -1,16 +1,13 @@
-Directory of model specifications and disaggregation specifications for
-these models. The waste disaggregation specification files are the same
-as those founds in [useeior’s
-diaggspecs](https://github.com/USEPA/useeior/tree/5e564aad45a528551288e25b95f009d1d761b841/inst/extdata/disaggspecs)
-and used in USEEIO v2.0.1-411, described in the [USEEIO v2.0
-paper](https://www.nature.com/articles/s41597-022-01293-7), but are
-included here for convenience.
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+Directory of model specifications for these models.
 
 ## Model Descriptions
 
 | Model Name        | \# of Sectors | Commodity (C) or Industry (I) | IO Data Year | GHG and Economic Output Year |
 |:------------------|--------------:|------------------------------:|-------------:|-----------------------------:|
 | USEEIOv2.1.19-GHG |           411 |                     Commodity |         2012 |                         2019 |
+| USEEIOv2.2.22-GHG |           402 |                     Commodity |         2017 |                         2022 |
 
 The model specification files use the [useeior Model Specification
 format](https://github.com/USEPA/useeior/blob/master/format_specs/ModelSpecification.md)

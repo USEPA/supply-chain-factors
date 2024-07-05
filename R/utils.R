@@ -39,7 +39,7 @@ checkModelIOYear <- function(modelname){
     stop(paste("Year in model name of", modelname,
                "≠ IO year in model specs. Review model specs."))
   }
-  if (model$specs$BaseIOLevel=="Detail" && model$specs$IOYear!=2012) {
-    stop(paste("Year in model name of", modelname, "≠ 2012. Review model specs."))
+  if (model$specs$BaseIOLevel=="Detail" && model$specs$IOYear!=2017) {
+    stop(paste("Year in model name of", modelname, "≠ 2017. Review model specs."))
   }
 }

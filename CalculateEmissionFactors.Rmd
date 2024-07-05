@@ -4,14 +4,10 @@ output:
   md_document:
     variant: gfm
 params:
-  dollaryear:
-    label: "Output Dollar Year"
-    value: 2021
-    input: select
-    choices: [2016, 2017, 2018, 2019, 2020, 2021]
+  dollaryear: 2022
 ---
 
-Generate supply chain GHG emission factors for NAICS-6 Commodities using 2019 GHG data in CO2-equivalent and by gas.
+Generate supply chain GHG emission factors for NAICS-6 Commodities using 2022 GHG data in CO2-equivalent and by gas.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -24,7 +20,7 @@ library(kableExtra)
 price_adjust_matrices <- c("B", "D", "M", "N", "M_margin", "N_margin")
 MajorGHGs <- c("Carbon dioxide", "Methane", "Nitrous oxide")
 dollaryear <- params$dollaryear
-modelname <- "USEEIOv2.1.19-GHG"
+modelname <- "USEEIOv2.2.22-GHG"
 checkModelIOYear(modelname)
 ```
 

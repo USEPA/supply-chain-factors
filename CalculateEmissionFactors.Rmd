@@ -4,10 +4,10 @@ output:
   md_document:
     variant: gfm
 params:
-  dollaryear: 2022
+  dollaryear: 2023
 ---
 
-Generate supply chain GHG emission factors for NAICS-6 Commodities using 2022 GHG data in CO2-equivalent and by gas.
+Generate supply chain GHG emission factors for NAICS-6 Commodities using 2023 GHG data in CO2-equivalent and by gas.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -20,7 +20,7 @@ library(kableExtra)
 price_adjust_matrices <- c("B", "D", "M", "N", "M_margin", "N_margin")
 MajorGHGs <- c("Carbon dioxide", "Methane", "Nitrous oxide")
 dollaryear <- params$dollaryear
-modelname <- "USEEIOv2.2.22-GHG"
+modelname <- "USEEIOv2.5.1-phoebe-23"
 checkModelIOYear(modelname)
 ```
 
@@ -86,7 +86,7 @@ MEF_df <- generateEmissionFactorTable(model, price_adjusted_model, margin = TRUE
 # Combine SEF and MEF tables
 df <- cbind(SEF_df, MEF_df[, "FlowAmount"], SEF_df[, "FlowAmount"] + MEF_df[, "FlowAmount"])
 
-# Filter only to include records which used the GWP-AR4-100 indicator
+# Filter only to include records which used the GWP-AR6-100 indicator
 table_characterized <- df[df$Flowable == "All GHGs", ]
 
 table_characterized <- prepareSEFtable(table_characterized,factorform="Decimal Form")

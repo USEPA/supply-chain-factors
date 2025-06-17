@@ -17,7 +17,7 @@ library(kableExtra)
 ```
 
 ```{r model-summary, include=FALSE}
-model_specs <- list.files("model-specs")[endsWith(list.files("model-specs"), "GHG.yml")]
+model_specs <- list.files("model-specs")[endsWith(list.files("model-specs"), ".yml")]
 ModelSummary <- data.frame()
 for (modelname in sub(".yml", "", model_specs)) {
   model <- useeior:::initializeModel(modelname,

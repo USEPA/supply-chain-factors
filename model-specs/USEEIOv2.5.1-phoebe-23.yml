@@ -1,0 +1,60 @@
+Model: "USEEIOv2.5.1-phoebe-23" 
+BaseIOSchema: 2017
+BaseIOLevel: "Detail"
+IOYear: 2017 # Year for IO data
+ModelRegionAcronyms: ["US"]
+ModelType: "EEIO"
+IODataSource: "BEA"
+BasePriceType: "PRO" #producer
+BasewithRedefinitions: FALSE
+CommodityorIndustryType: "Commodity"
+ScrapIncluded: FALSE
+DisaggregationSpecs: null
+
+SatelliteTable:
+  GHG:
+    FullName: "Greenhouse Gases"
+    Abbreviation: "GHG"
+    StaticSource: TRUE
+    StaticFile: "flowsa/FlowBySector/GHG_national_2023_m2_v2.1.0_70951b9.parquet"
+    FileLocation: "DataCommons"
+    DataYears: [2023]
+    Locations: ["US"]
+    SectorListSource: "NAICS"
+    SectorListYear: 2017
+    SectorListLevel: "6"
+    OriginalFlowSource: "FEDEFLv1.3.1"
+    ScriptFunctionCall: "getFlowbySectorCollapsed" #function to call for script
+    ScriptFunctionParameters: null
+    DataSources:
+      USEPA_GHG_2025:
+        Title: "GHG Inventory"
+        Author: "USEPA"
+        DataYear: 2023
+        URL: "https://www.edf.org/freedom-information-act-documents-epas-greenhouse-gas-inventory"
+        Primary: TRUE
+
+Indicators:
+  GreenhouseGases:
+    Name: "Greenhouse Gases"
+    Code: "GHG"
+    Group: "Impact Potential"
+    Unit: "kg CO2 eq"
+    SimpleUnit: "Kilograms Carbon Dioxide (CO2)"
+    SimpleName: "Greenhouse Gases"
+    StaticSource: TRUE
+    StaticFile: "lciafmt/ipcc/IPCC_v1.1.1_27ba917.parquet"
+    FileLocation: "DataCommons"
+    ScriptFunctionCall: "getImpactMethod" #function to call for script
+    ScriptFunctionParameters: 
+      indicators: ["AR6-100"]
+    DataSources:
+      IPCC_AR5:
+        Title: "IPCC Sixth Assessment Report: Direct Global Warming Potentials for 100 year time horizon"
+        Author: "IPCC"
+        DataYear: 2021
+        URL: ""
+        Primary: TRUE
+
+DemandVectors:
+    DefaultDemand: "DefaultDemandVectors" # Name of default demand vectors yml file

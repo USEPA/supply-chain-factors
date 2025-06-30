@@ -9,14 +9,14 @@ BasePriceType: "PRO" #producer
 BasewithRedefinitions: FALSE
 CommodityorIndustryType: "Commodity"
 ScrapIncluded: FALSE
-DisaggregationSpecs: null
+DisaggregationSpecs: WasteDisaggregationDetail2017
 
 SatelliteTable:
   GHG:
     FullName: "Greenhouse Gases"
     Abbreviation: "GHG"
     StaticSource: TRUE
-    StaticFile: "flowsa/FlowBySector/GHG_national_2023_m2_v2.1.0_70951b9.parquet"
+    StaticFile: "flowsa/FlowBySector/GHG_national_2023_m2_v2.1.0_a37e031.parquet"
     FileLocation: "DataCommons"
     DataYears: [2023]
     Locations: ["US"]
